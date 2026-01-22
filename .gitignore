@@ -7,7 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+
+# Build outputs
 dist
 dist-ssr
 *.local
@@ -23,12 +26,42 @@ dist-ssr
 *.sln
 *.sw?
 
+# Vite
 !node_modules/.vite
 
+# Tempobook
 **/tempobook/dynamic/
 **/tempobook/storyboards/
+**/tempobook/**
 
+# Core
 core
 
+# GitHub workflows (optional)
 .github/
 
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Capacitor - Android
+android/build/
+android/.gradle/
+android/app/build/
+android/app/release/
+android/local.properties
+android/gradle/wrapper/gradle-wrapper.jar
+
+# Capacitor - iOS
+ios/App/Pods/
+ios/App/build/
+ios/App/App.xcworkspace/xcuserdata/
+ios/App/App.xcodeproj/xcuserdata/
+ios/App/App.xcodeproj/project.xcworkspace/xcuserdata/
+ios/App/*.ipa
+
+# OS files
+Thumbs.db

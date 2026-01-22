@@ -12,6 +12,10 @@
     "types:supabase": "npx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > src/types/supabase.ts"
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.1",
+    "@capacitor/cli": "^7.4.5",
+    "@capacitor/core": "^8.0.1",
+    "@capacitor/ios": "^8.0.1",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -55,6 +59,7 @@
     "react-day-picker": "^9.12.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.68.0",
+    "react-qr-barcode-scanner": "^2.1.20",
     "react-resizable-panels": "^2.1.9",
     "react-router": "^6.23.1",
     "react-router-dom": "^6.23.1",
