@@ -526,7 +526,7 @@ export default function Settings() {
         {
           icon: User,
           label: t.developer,
-          sublabel: "SafeLink Security Team",
+          sublabel: "Al-Hisn Security Team",
           action: null,
           type: "info",
         },
@@ -619,8 +619,8 @@ export default function Settings() {
             <div className="text-center space-y-2">
               <p className="text-xs sm:text-sm text-muted-foreground">
                 {language === "ar"
-                  ? "© 2026 SafeLink. جميع الحقوق محفوظة."
-                  : "© 2026 SafeLink. All rights reserved."}
+                  ? "© 2026 الحصن. جميع الحقوق محفوظة."
+                  : "© 2026 Al-Hisn. All rights reserved."}
               </p>
               <p className="text-[10px] sm:text-xs text-muted-foreground/60">
                 {language === "ar"

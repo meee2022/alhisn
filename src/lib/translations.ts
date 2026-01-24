@@ -1,7 +1,7 @@
 export const translations = {
   ar: {
     // App Name
-    appName: 'SafeLink Guard',
+    appName: 'الحصن',
     appTagline: 'احمِ نفسك من الروابط الضارة',
     
     // Navigation
@@ -93,7 +93,7 @@ export const translations = {
     privacy: 'الخصوصية',
     privacySettings: 'إعدادات الخصوصية',
     about: 'عن التطبيق',
-    aboutApp: 'عن SafeLink Guard',
+    aboutApp: 'عن الحصن',
     
     // Authentication
     login: 'تسجيل الدخول',
@@ -123,7 +123,7 @@ export const translations = {
   },
   en: {
     // App Name
-    appName: 'SafeLink Guard',
+    appName: 'Al-Hisn',
     appTagline: 'Protect yourself from malicious links',
     
     // Navigation
@@ -215,7 +215,7 @@ export const translations = {
     privacy: 'Privacy',
     privacySettings: 'Privacy Settings',
     about: 'About',
-    aboutApp: 'About SafeLink Guard',
+    aboutApp: 'About Al-Hisn',
     
     // Authentication
     login: 'Login',

@@ -24,17 +24,7 @@ export default function Layout({
         <header className="glass-panel sticky top-0 z-40 border-b border-border/50 backdrop-blur-2xl pt-safe">
           <div className="container mx-auto px-4 py-3 sm:py-4">
             <div className="flex items-center justify-center gap-2 sm:gap-3">
-              <div className="relative">
-                <Shield
-                  className="w-7 h-7 sm:w-8 sm:h-8 text-primary neon-glow animate-pulse"
-                  style={{ animationDuration: "3s" }}
-                />
-                <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full" />
-                <div
-                  className="absolute -inset-1 border border-primary/20 rounded-full animate-ping"
-                  style={{ animationDuration: "3s" }}
-                />
-              </div>
+              {/* تم حذف صورة الشعار من الهيدر */}
               <div className="text-center">
                 <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-primary neon-glow tracking-wider">
                   {title || t.appName}

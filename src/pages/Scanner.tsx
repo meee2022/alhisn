@@ -25,6 +25,9 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import QRScanner from "@/components/QRScanner";
 
+// استيراد الشعار (تأكد من أن الملف موجود فعلاً بهذا الاسم في src/assets)
+import logoHisn from "@/assets/logo.png";
+
 export default function Scanner() {
   const { language, addScanToHistory } = useApp();
   const t = translations[language];
@@ -88,9 +91,16 @@ export default function Scanner() {
         {!scanResult && (
           <Card className="glass-panel safe-padding space-y-5 sm:space-y-6">
             <div className="text-center space-y-3">
-              <div className="relative inline-block">
-                <Shield className="w-12 h-12 sm:w-16 sm:h-16 text-primary mx-auto neon-glow" />
+              {/* اللوجو + النص أسفله */}
+              <div className="logo-wrapper">
+                <img
+                  src={logoHisn}
+                  alt="شعار الحصن"
+                  className="mx-auto w-24 sm:w-28 md:w-32 h-auto logo-image"
+                />
+                <div className="logo-subtitle mt-1">درعك الرقمي</div>
               </div>
+
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">
                 {t.scannerTitle}
               </h2>

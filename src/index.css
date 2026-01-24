@@ -99,7 +99,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: radial-gradient(
+    background-image:
+      radial-gradient(
         circle at 20% 50%,
         rgba(0, 255, 255, 0.03) 0%,
         transparent 50%
@@ -211,6 +212,19 @@
   .icon-danger {
     filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
     will-change: filter;
+  }
+
+  /* لوجو الحصن: حاوية + عنوان واضح + توهج للصورة */
+  .logo-wrapper {
+    @apply flex flex-col items-center justify-center space-y-1;
+  }
+
+  .logo-image {
+    filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.35));
+  }
+
+  .logo-subtitle {
+    @apply text-xs sm:text-sm text-primary/90;
   }
 
   /* Respect user's motion preferences */
