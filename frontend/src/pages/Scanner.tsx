@@ -98,18 +98,32 @@ export default function Scanner() {
           {/* Shield Status Section */}
           <div className="text-center pt-4">
             {/* Animated Shield with Glow */}
-            <div className="relative w-40 h-40 mx-auto mb-6">
-              {/* Outer rings */}
-              <div className="absolute inset-0 rounded-full border-2 border-[#00ff64]/20 animate-pulse" />
-              <div className="absolute inset-2 rounded-full border-2 border-[#00ff64]/30" />
-              <div className="absolute inset-4 rounded-full border-2 border-[#00ff64]/40" />
+            <div className="relative w-44 h-44 mx-auto mb-6">
+              {/* Glow effect behind */}
+              <div className="absolute inset-0 rounded-full bg-[#00ff64]/20 blur-3xl" />
               
-              {/* Glow background */}
-              <div className="absolute inset-6 rounded-full bg-gradient-to-br from-[#00ff64] via-[#00cc50] to-[#00ff64] opacity-90 shadow-[0_0_60px_rgba(0,255,100,0.5)]" />
+              {/* Outer rings with animation */}
+              <div className="absolute inset-0 rounded-full border-2 border-[#00ff64]/10" />
+              <div className="absolute inset-3 rounded-full border-2 border-[#00ff64]/20" />
+              <div className="absolute inset-6 rounded-full border-2 border-[#00ff64]/30" />
+              <div className="absolute inset-9 rounded-full border-2 border-[#00ff64]/50" />
+              
+              {/* Main glowing circle */}
+              <div 
+                className="absolute inset-10 rounded-full"
+                style={{
+                  background: 'radial-gradient(circle, #00ff64 0%, #00cc50 50%, #009940 100%)',
+                  boxShadow: '0 0 40px rgba(0, 255, 100, 0.8), 0 0 80px rgba(0, 255, 100, 0.5), 0 0 120px rgba(0, 255, 100, 0.3), inset 0 0 30px rgba(255, 255, 255, 0.2)'
+                }}
+              />
               
               {/* Shield icon */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <Shield className="w-16 h-16 text-black fill-black/20" />
+                <Shield 
+                  className="w-14 h-14 text-[#001a00]" 
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}
+                  fill="rgba(0,0,0,0.15)"
+                />
               </div>
             </div>
 
