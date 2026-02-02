@@ -65,3 +65,7 @@ ios/App/*.ipa
 
 # OS files
 Thumbs.db
+-e 
+# Environment files
+*.env
+*.env.*
