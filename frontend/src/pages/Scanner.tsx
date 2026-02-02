@@ -324,30 +324,30 @@ export default function Scanner() {
           <div className="flex-1 flex flex-col items-center justify-center">
             <div className="relative w-56 h-56">
               {/* Outer rings */}
-              <div className="absolute inset-0 rounded-full border-2 border-[#00ff64]/10" />
-              <div className="absolute inset-6 rounded-full border-2 border-[#00ff64]/15" />
-              <div className="absolute inset-12 rounded-full border-2 border-[#00ff64]/20" />
-              <div className="absolute inset-[4.5rem] rounded-full border-2 border-[#00ff64]/30" />
+              <div className="absolute inset-0 rounded-full border border-[#00ff64]/15" />
+              <div className="absolute inset-5 rounded-full border border-[#00ff64]/20" />
+              <div className="absolute inset-10 rounded-full border border-[#00ff64]/25" />
+              <div className="absolute inset-[3.75rem] rounded-full border border-[#00ff64]/35" />
               
               {/* Center circle with icon */}
-              <div className="absolute inset-[5.5rem] rounded-full bg-[#00ff64]/10 flex items-center justify-center">
-                <div className="w-12 h-12 rounded-full bg-[#00ff64]/20 flex items-center justify-center">
-                  <Search className="w-6 h-6 text-[#00ff64]" />
+              <div className="absolute inset-[4.5rem] rounded-full bg-gradient-to-br from-[#00ff64]/20 to-[#00ff64]/5 flex items-center justify-center border border-[#00ff64]/30">
+                <div className="w-10 h-10 rounded-full bg-[#00ff64]/30 flex items-center justify-center">
+                  <Search className="w-5 h-5 text-[#00ff64]" />
                 </div>
               </div>
               
-              {/* Scanning line animation */}
+              {/* Scanning sweep animation */}
               <div 
-                className="absolute inset-0 rounded-full"
+                className="absolute inset-0 rounded-full overflow-hidden"
                 style={{
-                  background: 'conic-gradient(from 0deg, transparent 0deg, rgba(0, 255, 100, 0.3) 30deg, transparent 60deg)',
-                  animation: 'spin 3s linear infinite'
+                  background: 'conic-gradient(from 0deg, transparent 0deg, rgba(0, 255, 100, 0.15) 60deg, rgba(0, 255, 100, 0.3) 90deg, transparent 120deg)',
+                  animation: 'spin 4s linear infinite'
                 }}
               />
             </div>
             
-            <div className="text-center mt-6">
-              <h3 className="text-[#00ff64] font-semibold text-lg mb-1">
+            <div className="text-center mt-8">
+              <h3 className="text-[#00ff64] font-bold text-xl mb-2">
                 {isRTL ? "جاهز للفحص" : "Ready to Scan"}
               </h3>
               <p className="text-[#00ff64]/50 text-sm">
