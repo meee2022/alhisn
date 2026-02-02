@@ -259,53 +259,100 @@ export default function Scanner() {
   if (showUrlInput && !scanResult && !isScanning) {
     return (
       <Layout>
-        <div className="max-w-lg mx-auto space-y-6 px-4">
-          {/* Header */}
-          <button
-            onClick={() => setShowUrlInput(false)}
-            className="flex items-center gap-2 text-[#00ff64]"
-          >
-            <ChevronLeft className={cn("w-5 h-5", !isRTL && "rotate-180")} />
-            <span>{isRTL ? "رجوع" : "Back"}</span>
-          </button>
+        <div className="max-w-lg mx-auto px-4 flex flex-col min-h-[calc(100vh-180px)]">
+          {/* Header Title */}
+          <div className="text-center pt-4 mb-6">
+            <h1 className="text-2xl font-bold text-[#00ff64] mb-2">
+              {isRTL ? "فحص الروابط المشبوهة" : "Scan Suspicious Links"}
+            </h1>
+            <p className="text-[#00ff64]/60 text-sm">
+              {isRTL ? "احمِ نفسك من عمليات الاحتيال والتصيد" : "Protect yourself from scams and phishing"}
+            </p>
+          </div>
 
-          <Card className="glass-panel safe-padding space-y-5">
-            <div className="text-center space-y-3">
-              <div className="w-20 h-20 mx-auto rounded-full bg-[#00ff64]/20 flex items-center justify-center">
-                <Link2 className="w-10 h-10 text-[#00ff64]" />
-              </div>
-              <h2 className="text-xl font-bold text-white">
-                {isRTL ? "فحص رابط" : "Scan Link"}
-              </h2>
-              <p className="text-[#00ff64]/60 text-sm">
-                {isRTL ? "أدخل الرابط للتحقق من سلامته" : "Enter URL to verify its safety"}
-              </p>
+          {/* URL Input Section */}
+          <div className="space-y-4 mb-6">
+            <div className={cn("text-sm text-[#00ff64]/80", isRTL ? "text-right" : "text-left")}>
+              {isRTL ? "رابط الموقع" : "Website URL"}
             </div>
-
-            <div className="space-y-4">
+            
+            <div className="relative">
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                <Link2 className="w-5 h-5 text-[#00ff64]" />
+              </div>
               <Input
                 type="text"
-                placeholder={t.enterUrl}
+                placeholder={isRTL ? "أدخل الرابط هنا (https://...)" : "Enter URL here (https://...)"}
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleScan()}
-                className="glass-panel h-14 text-base px-4 border-[#00ff64]/30 focus:border-[#00ff64] bg-transparent text-white placeholder:text-[#00ff64]/40"
+                className="glass-panel h-14 text-base pr-12 pl-14 border-[#00ff64]/30 focus:border-[#00ff64] bg-[#0a150a]/80 text-white placeholder:text-[#00ff64]/40 rounded-xl"
                 disabled={isScanning}
                 dir="ltr"
                 data-testid="url-input"
               />
-
-              <Button
-                onClick={handleScan}
-                disabled={isScanning || !url.trim()}
-                className="w-full h-14 text-lg bg-gradient-to-r from-[#00ff64] to-[#00cc50] hover:from-[#00cc50] hover:to-[#00ff64] text-black font-bold rounded-full"
-                data-testid="start-scan-btn"
+              <button 
+                onClick={async () => {
+                  try {
+                    const text = await navigator.clipboard.readText();
+                    setUrl(text);
+                    toast.success(t.pasteFromClipboard);
+                  } catch (error) {
+                    toast.error("تعذّر قراءة الحافظة");
+                  }
+                }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-[#00ff64]/20 flex items-center justify-center hover:bg-[#00ff64]/30 transition-colors"
               >
-                <Shield className="w-5 h-5 mr-2" />
-                {t.startScan}
-              </Button>
+                <Clipboard className="w-4 h-4 text-[#00ff64]" />
+              </button>
             </div>
-          </Card>
+
+            <Button
+              onClick={handleScan}
+              disabled={isScanning || !url.trim()}
+              className="w-full h-14 text-lg bg-gradient-to-r from-[#00ff64] to-[#00cc50] hover:from-[#00cc50] hover:to-[#00ff64] text-black font-bold rounded-full shadow-[0_4px_20px_rgba(0,255,100,0.4)] disabled:opacity-50"
+              data-testid="start-scan-btn"
+            >
+              <Search className="w-5 h-5 mr-2" />
+              {isRTL ? "افحص الرابط الآن" : "Scan Link Now"}
+            </Button>
+          </div>
+
+          {/* Radar Animation Section */}
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <div className="relative w-56 h-56">
+              {/* Outer rings */}
+              <div className="absolute inset-0 rounded-full border-2 border-[#00ff64]/10" />
+              <div className="absolute inset-6 rounded-full border-2 border-[#00ff64]/15" />
+              <div className="absolute inset-12 rounded-full border-2 border-[#00ff64]/20" />
+              <div className="absolute inset-[4.5rem] rounded-full border-2 border-[#00ff64]/30" />
+              
+              {/* Center circle with icon */}
+              <div className="absolute inset-[5.5rem] rounded-full bg-[#00ff64]/10 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-[#00ff64]/20 flex items-center justify-center">
+                  <Search className="w-6 h-6 text-[#00ff64]" />
+                </div>
+              </div>
+              
+              {/* Scanning line animation */}
+              <div 
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: 'conic-gradient(from 0deg, transparent 0deg, rgba(0, 255, 100, 0.3) 30deg, transparent 60deg)',
+                  animation: 'spin 3s linear infinite'
+                }}
+              />
+            </div>
+            
+            <div className="text-center mt-6">
+              <h3 className="text-[#00ff64] font-semibold text-lg mb-1">
+                {isRTL ? "جاهز للفحص" : "Ready to Scan"}
+              </h3>
+              <p className="text-[#00ff64]/50 text-sm">
+                {isRTL ? "اضغط على الزر أعلاه للبدء" : "Press the button above to start"}
+              </p>
+            </div>
+          </div>
         </div>
 
         <QRScanner
