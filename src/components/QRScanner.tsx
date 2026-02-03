@@ -1,5 +1,5 @@
 import { useState } from "react";
-import QrBarcodeScanner from "react-qr-barcode-scanner";
+import QrBarcodeScanner, { Result } from "react-qr-barcode-scanner";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,23 @@ export default function QRScanner({ open, onClose, onResult }: QRScannerProps) {
     onClose();
   };
 
+  const handleUpdate = (_err: unknown, result?: Result) => {
+    if (!result) return;
+
+    const anyResult = result as any;
+    const text: string =
+      typeof anyResult.getText === "function"
+        ? anyResult.getText()
+        : anyResult.text ?? "";
+
+    if (!text) return;
+
+    setHasScanned(true);
+    onResult(text);
+    toast.success("تم قراءة الرابط من رمز QR");
+    handleClose();
+  };
+
   return (
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
       <DialogContent className="glass-panel max-w-md">
@@ -34,16 +51,8 @@ export default function QRScanner({ open, onClose, onResult }: QRScannerProps) {
           <div className="aspect-square rounded-xl overflow-hidden glass-panel">
             {!hasScanned && (
               <QrBarcodeScanner
-                constraints={{ facingMode: "environment" }}
-                onUpdate={(_err, result) => {
-                  if (result && result.text) {
-                    const text = result.text;
-                    setHasScanned(true);
-                    onResult(text);
-                    toast.success("تم قراءة الرابط من رمز QR");
-                    handleClose();
-                  }
-                }}
+                {...({ constraints: { facingMode: "environment" } } as any)}
+                onUpdate={handleUpdate}
                 style={{ width: "100%", height: "100%" }}
               />
             )}
