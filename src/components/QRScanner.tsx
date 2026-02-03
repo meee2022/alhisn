@@ -51,7 +51,6 @@ export default function QRScanner({ open, onClose, onResult }: QRScannerProps) {
           <div className="aspect-square rounded-xl overflow-hidden glass-panel">
             {!hasScanned && (
               <QrBarcodeScanner
-                // نمرّر constraints عن طريق cast لـ any حتى لا يتحقق TypeScript من الـ prop
                 {...({ constraints: { facingMode: "environment" } } as any)}
                 onUpdate={handleUpdate}
                 style={{ width: "100%", height: "100%" }}
