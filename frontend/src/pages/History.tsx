@@ -6,13 +6,13 @@ import {
   AlertTriangle,
   CheckCircle2,
   XCircle,
+  Clock,
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { useApp } from "@/contexts/AppContext";
 import { translations } from "@/lib/translations";
-import { getRiskColor, getRiskBgColor, formatDate } from "@/lib/scanner";
+import { formatDate } from "@/lib/scanner";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
@@ -30,10 +30,11 @@ import {
 export default function History() {
   const { language, scanHistory, clearHistory } = useApp();
   const t = translations[language];
+  const isRTL = language === "ar";
 
   const handleClearHistory = () => {
     clearHistory();
-    toast.success("تم مسح السجل بنجاح");
+    toast.success(isRTL ? "تم مسح السجل بنجاح" : "History cleared successfully");
   };
 
   const handleOpenLink = (url: string) => {
@@ -43,238 +44,226 @@ export default function History() {
   const getRiskIcon = (riskLevel: string) => {
     switch (riskLevel) {
       case "safe":
-        return (
-          <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
-        );
+        return <CheckCircle2 className="w-5 h-5 text-[#00ff64]" />;
       case "suspicious":
-        return (
-          <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
-        );
+        return <AlertTriangle className="w-5 h-5 text-yellow-400" />;
       case "dangerous":
-        return <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />;
+        return <XCircle className="w-5 h-5 text-red-400" />;
       default:
-        return <Shield className="w-4 h-4 sm:w-5 sm:h-5" />;
+        return <Shield className="w-5 h-5 text-[#00ff64]" />;
+    }
+  };
+
+  const getRiskColor = (riskLevel: string) => {
+    switch (riskLevel) {
+      case "safe":
+        return "text-[#00ff64]";
+      case "suspicious":
+        return "text-yellow-400";
+      case "dangerous":
+        return "text-red-400";
+      default:
+        return "text-[#00ff64]";
+    }
+  };
+
+  const getRiskBg = (riskLevel: string) => {
+    switch (riskLevel) {
+      case "safe":
+        return "bg-[#00ff64]/10 border-[#00ff64]/30";
+      case "suspicious":
+        return "bg-yellow-400/10 border-yellow-400/30";
+      case "dangerous":
+        return "bg-red-400/10 border-red-400/30";
+      default:
+        return "bg-[#00ff64]/10 border-[#00ff64]/30";
     }
   };
 
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto space-y-4 sm:space-y-6 px-4 sm:px-0">
-        <Card className="glass-panel safe-padding">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-5 sm:mb-6">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <HistoryIcon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-primary neon-glow" />
-              </div>
-              <div>
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-primary">
-                  {t.historyTitle}
-                </h2>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  {scanHistory.length}{" "}
-                  {scanHistory.length === 1 ? "عنصر" : t.itemsScanned}
-                </p>
-              </div>
+      <div className="max-w-lg mx-auto px-4 pb-6">
+        {/* Header */}
+        <div className="text-center pt-4 mb-6">
+          <div className="relative w-16 h-16 mx-auto mb-4">
+            <div className="absolute inset-0 rounded-full bg-[#00ff64]/20 blur-xl" />
+            <div className="absolute inset-0 rounded-full bg-[#00ff64]/10 flex items-center justify-center">
+              <Clock className="w-8 h-8 text-[#00ff64]" style={{ filter: 'drop-shadow(0 0 10px rgba(0,255,100,0.6))' }} />
             </div>
-
-            {scanHistory.length > 0 && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="glass-panel-hover gap-2 w-full sm:w-auto touch-target text-destructive hover:text-destructive border-destructive/30 hover:border-destructive/50"
-                  >
-                    <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    <span className="text-xs sm:text-sm">{t.clearAll}</span>
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="glass-panel border-border max-w-[90vw] sm:max-w-md">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="text-base sm:text-lg">
-                      {t.clearHistoryConfirm}
-                    </AlertDialogTitle>
-                    <AlertDialogDescription className="text-xs sm:text-sm">
-                      لا يمكن التراجع عن هذا الإجراء. سيتم حذف جميع سجلات الفحص
-                      نهائياً.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-                    <AlertDialogCancel className="glass-panel-hover w-full sm:w-auto touch-target m-0">
-                      {t.cancel}
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleClearHistory}
-                      className="bg-destructive hover:bg-destructive/90 w-full sm:w-auto touch-target m-0"
-                    >
-                      {t.confirm}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
           </div>
+          <h1 className="text-2xl font-bold text-[#00ff64] mb-2">
+            {isRTL ? "سجل الفحوصات" : "Scan History"}
+          </h1>
+          <p className="text-[#00ff64]/60 text-sm">
+            {scanHistory.length} {isRTL ? "عنصر مفحوص" : "items scanned"}
+          </p>
+        </div>
 
-          {scanHistory.length === 0 ? (
-            <div className="text-center py-12 sm:py-16 space-y-4">
-              <div className="relative inline-block">
-                <Shield className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-muted-foreground/30 mx-auto" />
-                <div className="absolute inset-0 bg-muted-foreground/10 blur-2xl" />
-              </div>
-              <div>
-                <h3 className="text-lg sm:text-xl font-semibold text-muted-foreground mb-2">
-                  {t.noHistory}
-                </h3>
-                <p className="text-xs sm:text-sm text-muted-foreground px-4">
-                  {t.noHistoryDesc}
-                </p>
+        {/* Clear Button */}
+        {scanHistory.length > 0 && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="w-full glass-panel p-3 mb-4 flex items-center justify-center gap-2 text-red-400 hover:bg-red-500/10 transition-colors">
+                <Trash2 className="w-4 h-4" />
+                <span className="text-sm">{isRTL ? "مسح السجل" : "Clear History"}</span>
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="glass-panel border-[#00ff64]/20 max-w-[90vw] sm:max-w-md mx-4">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-[#00ff64]">
+                  {isRTL ? "تأكيد المسح" : "Confirm Clear"}
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-[#00ff64]/60">
+                  {isRTL 
+                    ? "لا يمكن التراجع عن هذا الإجراء. سيتم حذف جميع سجلات الفحص نهائياً."
+                    : "This action cannot be undone. All scan records will be permanently deleted."}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                <AlertDialogCancel className="glass-panel border-[#00ff64]/30 text-[#00ff64] hover:bg-[#00ff64]/10">
+                  {isRTL ? "إلغاء" : "Cancel"}
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleClearHistory}
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                >
+                  {isRTL ? "تأكيد" : "Confirm"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+
+        {/* Empty State */}
+        {scanHistory.length === 0 ? (
+          <div className="glass-panel p-8 text-center">
+            <div className="relative w-24 h-24 mx-auto mb-4">
+              <div className="absolute inset-0 rounded-full bg-[#00ff64]/10" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Shield className="w-12 h-12 text-[#00ff64]/30" />
               </div>
             </div>
-          ) : (
-            <div className="space-y-3 scroll-optimized">
-              {scanHistory.map((scan, index) => (
-                <Card
-                  key={scan.id}
-                  className={cn(
-                    "glass-panel p-3 sm:p-4 border-2 transition-all duration-300 card-shine",
-                    getRiskBgColor(scan.riskLevel),
-                    "hover:scale-[1.01]",
-                  )}
-                  style={{
-                    animationDelay: `${index * 50}ms`,
-                    animation: "fadeInUp 0.3s ease-out forwards",
-                  }}
-                >
-                  <div className="space-y-2 sm:space-y-3">
-                    <div className="flex items-start justify-between gap-2 sm:gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          {getRiskIcon(scan.riskLevel)}
-                          <span
-                            className={cn(
-                              "text-[10px] sm:text-xs font-bold uppercase px-2 py-0.5 rounded-full",
-                              getRiskColor(scan.riskLevel),
-                              "bg-current/10 border border-current/20",
-                            )}
-                          >
-                            {t[scan.riskLevel]}
-                          </span>
-                        </div>
-                        <p className="text-xs sm:text-sm text-foreground break-all mb-1.5 line-clamp-2">
-                          {scan.url}
-                        </p>
-                        <p className="text-[10px] sm:text-xs text-muted-foreground/60 flex items-center gap-1">
-                          <HistoryIcon className="w-3 h-3" />
-                          {formatDate(scan.timestamp, language)}
-                        </p>
-                      </div>
+            <h3 className="text-lg font-semibold text-white mb-2">
+              {isRTL ? "لا يوجد سجل فحوصات" : "No Scan History"}
+            </h3>
+            <p className="text-[#00ff64]/50 text-sm">
+              {isRTL ? "ابدأ بفحص رابطك الأول!" : "Start by scanning your first link!"}
+            </p>
+          </div>
+        ) : (
+          /* History List */
+          <div className="space-y-3">
+            {scanHistory.map((scan, index) => (
+              <div
+                key={scan.id}
+                className={cn(
+                  "glass-panel p-4 border",
+                  getRiskBg(scan.riskLevel)
+                )}
+              >
+                {/* Header Row */}
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="flex items-center gap-2">
+                    {getRiskIcon(scan.riskLevel)}
+                    <span className={cn(
+                      "text-xs font-bold uppercase px-2 py-1 rounded-full",
+                      getRiskBg(scan.riskLevel),
+                      getRiskColor(scan.riskLevel)
+                    )}>
+                      {scan.riskLevel === "safe" && (isRTL ? "آمن" : "Safe")}
+                      {scan.riskLevel === "suspicious" && (isRTL ? "مشبوه" : "Suspicious")}
+                      {scan.riskLevel === "dangerous" && (isRTL ? "خطير" : "Dangerous")}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleOpenLink(scan.url)}
+                    disabled={scan.riskLevel === "dangerous"}
+                    className={cn(
+                      "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
+                      scan.riskLevel === "dangerous" 
+                        ? "bg-[#00ff64]/5 text-[#00ff64]/30 cursor-not-allowed"
+                        : "bg-[#00ff64]/10 text-[#00ff64] hover:bg-[#00ff64]/20"
+                    )}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </button>
+                </div>
 
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleOpenLink(scan.url)}
-                        disabled={scan.riskLevel === "dangerous"}
-                        className="shrink-0 h-8 w-8 sm:h-9 sm:w-9 p-0 hover:bg-primary/10"
-                        title={
-                          scan.riskLevel === "dangerous"
-                            ? "رابط خطير - لا يُنصح بفتحه"
-                            : "فتح الرابط"
-                        }
-                      >
-                        <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      </Button>
+                {/* URL */}
+                <p className="text-sm text-white break-all mb-2 line-clamp-2" dir="ltr">
+                  {scan.url}
+                </p>
+
+                {/* Time */}
+                <div className="flex items-center gap-1 text-[#00ff64]/50 text-xs mb-3">
+                  <HistoryIcon className="w-3 h-3" />
+                  <span>{formatDate(scan.timestamp, language)}</span>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-4 gap-2">
+                  <div className={cn(
+                    "rounded-lg p-2 text-center border",
+                    scan.details.phishing 
+                      ? "bg-red-500/10 border-red-500/30" 
+                      : "bg-[#00ff64]/10 border-[#00ff64]/30"
+                  )}>
+                    <div className="text-[10px] text-[#00ff64]/60 mb-1">
+                      {isRTL ? "تصيد" : "Phishing"}
                     </div>
-
-                    <div className="grid grid-cols-4 gap-1.5 sm:gap-2 text-center">
-                      <div
-                        className={cn(
-                          "glass-panel rounded-lg p-1.5 sm:p-2 border transition-colors",
-                          scan.details.phishing
-                            ? "bg-red-500/10 border-red-500/30"
-                            : "bg-emerald-500/10 border-emerald-500/30",
-                        )}
-                      >
-                        <div className="text-[9px] sm:text-[10px] text-muted-foreground mb-0.5 font-medium">
-                          Phishing
-                        </div>
-                        <div
-                          className={cn(
-                            "text-xs sm:text-sm font-bold",
-                            scan.details.phishing
-                              ? "text-red-400"
-                              : "text-emerald-400",
-                          )}
-                        >
-                          {scan.details.phishing ? "نعم" : "لا"}
-                        </div>
-                      </div>
-
-                      <div
-                        className={cn(
-                          "glass-panel rounded-lg p-1.5 sm:p-2 border transition-colors",
-                          scan.details.malware
-                            ? "bg-red-500/10 border-red-500/30"
-                            : "bg-emerald-500/10 border-emerald-500/30",
-                        )}
-                      >
-                        <div className="text-[9px] sm:text-[10px] text-muted-foreground mb-0.5 font-medium">
-                          Malware
-                        </div>
-                        <div
-                          className={cn(
-                            "text-xs sm:text-sm font-bold",
-                            scan.details.malware
-                              ? "text-red-400"
-                              : "text-emerald-400",
-                          )}
-                        >
-                          {scan.details.malware ? "نعم" : "لا"}
-                        </div>
-                      </div>
-
-                      <div
-                        className={cn(
-                          "glass-panel rounded-lg p-1.5 sm:p-2 border transition-colors",
-                          scan.details.ssl
-                            ? "bg-emerald-500/10 border-emerald-500/30"
-                            : "bg-red-500/10 border-red-500/30",
-                        )}
-                      >
-                        <div className="text-[9px] sm:text-[10px] text-muted-foreground mb-0.5 font-medium">
-                          SSL
-                        </div>
-                        <div
-                          className={cn(
-                            "text-xs sm:text-sm font-bold",
-                            scan.details.ssl
-                              ? "text-emerald-400"
-                              : "text-red-400",
-                          )}
-                        >
-                          {scan.details.ssl ? "نعم" : "لا"}
-                        </div>
-                      </div>
-
-                      <div className="glass-panel rounded-lg p-1.5 sm:p-2 border border-primary/20 bg-primary/5">
-                        <div className="text-[9px] sm:text-[10px] text-muted-foreground mb-0.5 font-medium">
-                          النتيجة
-                        </div>
-                        <div
-                          className={cn(
-                            "text-xs sm:text-sm font-bold",
-                            getRiskColor(scan.riskLevel),
-                          )}
-                        >
-                          {scan.details.reputation}
-                        </div>
-                      </div>
+                    <div className={cn(
+                      "text-xs font-bold",
+                      scan.details.phishing ? "text-red-400" : "text-[#00ff64]"
+                    )}>
+                      {scan.details.phishing ? (isRTL ? "نعم" : "Yes") : (isRTL ? "لا" : "No")}
                     </div>
                   </div>
-                </Card>
-              ))}
-            </div>
-          )}
-        </Card>
+
+                  <div className={cn(
+                    "rounded-lg p-2 text-center border",
+                    scan.details.malware 
+                      ? "bg-red-500/10 border-red-500/30" 
+                      : "bg-[#00ff64]/10 border-[#00ff64]/30"
+                  )}>
+                    <div className="text-[10px] text-[#00ff64]/60 mb-1">
+                      {isRTL ? "ضار" : "Malware"}
+                    </div>
+                    <div className={cn(
+                      "text-xs font-bold",
+                      scan.details.malware ? "text-red-400" : "text-[#00ff64]"
+                    )}>
+                      {scan.details.malware ? (isRTL ? "نعم" : "Yes") : (isRTL ? "لا" : "No")}
+                    </div>
+                  </div>
+
+                  <div className={cn(
+                    "rounded-lg p-2 text-center border",
+                    scan.details.ssl 
+                      ? "bg-[#00ff64]/10 border-[#00ff64]/30" 
+                      : "bg-red-500/10 border-red-500/30"
+                  )}>
+                    <div className="text-[10px] text-[#00ff64]/60 mb-1">SSL</div>
+                    <div className={cn(
+                      "text-xs font-bold",
+                      scan.details.ssl ? "text-[#00ff64]" : "text-red-400"
+                    )}>
+                      {scan.details.ssl ? (isRTL ? "نعم" : "Yes") : (isRTL ? "لا" : "No")}
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg p-2 text-center border bg-[#00ff64]/10 border-[#00ff64]/30">
+                    <div className="text-[10px] text-[#00ff64]/60 mb-1">
+                      {isRTL ? "النتيجة" : "Score"}
+                    </div>
+                    <div className={cn("text-xs font-bold", getRiskColor(scan.riskLevel))}>
+                      {scan.details.reputation}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </Layout>
   );
