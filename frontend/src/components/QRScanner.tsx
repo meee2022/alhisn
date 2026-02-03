@@ -1,5 +1,5 @@
 import { useState } from "react";
-import QrBarcodeScanner from "react-qr-barcode-scanner";
+import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import {
   Dialog,
   DialogContent,
@@ -33,18 +33,21 @@ export default function QRScanner({ open, onClose, onResult }: QRScannerProps) {
         <div className="space-y-4">
           <div className="aspect-square rounded-xl overflow-hidden glass-panel">
             {!hasScanned && (
-              <QrBarcodeScanner
-                constraints={{ facingMode: "environment" }}
-                onUpdate={(_err, result) => {
-                  if (result && result.text) {
-                    const text = result.text;
-                    setHasScanned(true);
-                    onResult(text);
-                    toast.success("تم قراءة الرابط من رمز QR");
-                    handleClose();
+              <BarcodeScannerComponent
+                width="100%"
+                height="100%"
+                facingMode="environment"
+                onUpdate={(_err: unknown, result: any) => {
+                  if (result) {
+                    const text = result.getText ? result.getText() : String(result);
+                    if (text) {
+                      setHasScanned(true);
+                      onResult(text);
+                      toast.success("تم قراءة الرابط من رمز QR");
+                      handleClose();
+                    }
                   }
                 }}
-                style={{ width: "100%", height: "100%" }}
               />
             )}
           </div>
