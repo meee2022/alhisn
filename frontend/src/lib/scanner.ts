@@ -16,22 +16,31 @@ export const normalizeUrl = (url: string): string => {
   return url;
 };
 
+// امتدادات عالية الخطورة (تقدر تعدّل)
+const highRiskTlds = ['tk', 'ml', 'ga', 'cf', 'gq', 'party', 'xyz'];
+
+// دومينات محجوبة صراحة (مثال، عدّلها براحتك)
+const blockedDomains = ['rqyx.party'];
+
 // Simulated URL scanning logic - In production, this would call real security APIs
 export const scanUrl = async (url: string): Promise<ScanResult> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 1000));
-  
+
   const normalizedUrl = normalizeUrl(url);
   const urlLower = normalizedUrl.toLowerCase();
-  
-  // Simple heuristic checks for demo purposes
-  const suspiciousKeywords = ['login', 'verify', 'secure', 'account', 'update', 'confirm', 'bank', 'paypal', 'apple', 'amazon', 'suspended'];
-  const dangerousPatterns = [
-    'bit.ly', 'tinyurl', 'goo.gl', // URL shorteners
-    'tk', 'ml', 'ga', 'cf', // Free domains often used in phishing
-    'password', 'urgent', 'winner', 'prize'
+
+  // Simple heuristic checks for demo purposes (مشدد)
+  const suspiciousKeywords = [
+    'login', 'signin', 'verify', 'secure', 'account', 'update', 'confirm',
+    'bank', 'paypal', 'apple', 'amazon', 'suspended', 'wallet', 'crypto'
   ];
-  
+
+  const dangerousPatterns = [
+    'bit.ly', 'tinyurl', 'goo.gl', 't.co', 'ow.ly',
+    'password', 'urgent', 'winner', 'prize', 'free-gift', 'gift-card'
+  ];
+
   let riskScore = 0;
   const details = {
     phishing: false,
@@ -40,54 +49,72 @@ export const scanUrl = async (url: string): Promise<ScanResult> => {
     ssl: normalizedUrl.startsWith('https://'),
     reputation: 100
   };
-  
-  // Check for suspicious keywords
-  const hasSuspiciousKeywords = suspiciousKeywords.some(keyword => urlLower.includes(keyword));
-  if (hasSuspiciousKeywords) {
-    riskScore += 30;
+
+  const hostname = new URL(normalizedUrl).hostname.toLowerCase();
+
+  // 1) دومينات محجوبة صراحة
+  if (blockedDomains.some(d => hostname === d || hostname.endsWith(`.${d}`))) {
+    riskScore += 90;
+    details.phishing = true;
     details.suspicious = true;
   }
-  
-  // Check for dangerous patterns
-  const hasDangerousPatterns = dangerousPatterns.some(pattern => urlLower.includes(pattern));
-  if (hasDangerousPatterns) {
-    riskScore += 50;
-    details.phishing = true;
-    details.malware = Math.random() > 0.5;
-  }
-  
-  // Check SSL
-  if (!details.ssl) {
-    riskScore += 40;
-  }
-  
-  // Check for IP addresses in URL (often suspicious)
-  if (/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(urlLower)) {
+
+  // 2) امتداد عالي الخطورة
+  const hostParts = hostname.split('.');
+  const tld = hostParts[hostParts.length - 1] || '';
+  if (highRiskTlds.includes(tld)) {
     riskScore += 35;
     details.suspicious = true;
   }
-  
-  // Check for excessive subdomains
-  const domain = normalizedUrl.split('//')[1]?.split('/')[0] || '';
-  const subdomains = domain.split('.');
-  if (subdomains.length > 3) {
-    riskScore += 25;
+
+  // 3) كلمات مشبوهة في الرابط
+  const hasSuspiciousKeywords = suspiciousKeywords.some(keyword => urlLower.includes(keyword));
+  if (hasSuspiciousKeywords) {
+    riskScore += 40;
     details.suspicious = true;
   }
-  
+
+  // 4) patterns خطيرة
+  const hasDangerousPatterns = dangerousPatterns.some(pattern => urlLower.includes(pattern));
+  if (hasDangerousPatterns) {
+    riskScore += 60;
+    details.phishing = true;
+    details.malware = Math.random() > 0.3;
+  }
+
+  // 5) عدم وجود SSL
+  if (!details.ssl) {
+    riskScore += 50;
+  }
+
+  // 6) IP address في الرابط
+  if (/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(urlLower)) {
+    riskScore += 40;
+    details.suspicious = true;
+  }
+
+  // 7) subdomains كثيرة
+  if (hostParts.length > 3) {
+    riskScore += 30;
+    details.suspicious = true;
+  }
+
+  // سقف للـ score
+  riskScore = Math.min(riskScore, 100);
+
   // Determine risk level
   let riskLevel: RiskLevel;
   if (riskScore >= 60) {
     riskLevel = 'dangerous';
-    details.reputation = Math.max(0, 100 - riskScore);
-  } else if (riskScore >= 30) {
+    details.reputation = Math.max(0, 100 - riskScore); // 0–40
+  } else if (riskScore >= 25) {
     riskLevel = 'suspicious';
-    details.reputation = Math.max(20, 100 - riskScore);
+    details.reputation = Math.max(10, 100 - riskScore); // 10–75
   } else {
     riskLevel = 'safe';
-    details.reputation = Math.max(70, 100 - riskScore);
+    details.reputation = Math.max(80, 100 - riskScore); // ≥80
   }
-  
+
   return {
     id: Date.now().toString(),
     url: normalizedUrl,
