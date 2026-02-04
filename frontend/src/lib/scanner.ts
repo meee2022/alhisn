@@ -17,10 +17,59 @@ export const normalizeUrl = (url: string): string => {
 };
 
 // امتدادات عالية الخطورة (تقدر تعدّل)
-const highRiskTlds = ['tk', 'ml', 'ga', 'cf', 'gq', 'party', 'xyz'];
+const highRiskTlds = [
+  'tk','ml','ga','cf','gq','party','xyz','top','click','fit','rest','work'
+];
 
-// دومينات محجوبة صراحة (مثال، عدّلها براحتك)
+// دومينات محجوبة صراحة (أضف عليها اللي تريده)
 const blockedDomains = ['rqyx.party'];
+
+// كلمات وعبارات مشبوهة
+const suspiciousKeywords = [
+  'login','signin','sign-in','auth','verify','secure','account','update','confirm',
+  'bank','paypal','apple','amazon','suspended','wallet','crypto','airdrop',
+  'giveaway','support','helpdesk'
+];
+
+const dangerousPatterns = [
+  'bit.ly','tinyurl','goo.gl','t.co','ow.ly','cutt.ly','rb.gy',
+  'password','urgent','winner','prize','free-gift','gift-card',
+  'verify-your-account','update-billing','free-iphone'
+];
+
+// (اختياري) فحص Google Safe Browsing
+async function checkWithGoogleSafeBrowsing(url: string): Promise<boolean> {
+  const apiKey = import.meta.env.VITE_GSB_API_KEY; // أو process.env في backend
+  if (!apiKey) return false;
+
+  const body = {
+    client: { clientId: "safelink-guard", clientVersion: "1.0" },
+    threatInfo: {
+      threatTypes: [
+        "MALWARE",
+        "SOCIAL_ENGINEERING",
+        "UNWANTED_SOFTWARE",
+        "POTENTIALLY_HARMFUL_APPLICATION"
+      ],
+      platformTypes: ["ANY_PLATFORM"],
+      threatEntryTypes: ["URL"],
+      threatEntries: [{ url }]
+    }
+  };
+
+  const res = await fetch(
+    `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    }
+  );
+
+  if (!res.ok) return false;
+  const data = await res.json();
+  return !!data?.matches?.length;
+}
 
 // Simulated URL scanning logic - In production, this would call real security APIs
 export const scanUrl = async (url: string): Promise<ScanResult> => {
@@ -29,17 +78,6 @@ export const scanUrl = async (url: string): Promise<ScanResult> => {
 
   const normalizedUrl = normalizeUrl(url);
   const urlLower = normalizedUrl.toLowerCase();
-
-  // Simple heuristic checks for demo purposes (مشدد)
-  const suspiciousKeywords = [
-    'login', 'signin', 'verify', 'secure', 'account', 'update', 'confirm',
-    'bank', 'paypal', 'apple', 'amazon', 'suspended', 'wallet', 'crypto'
-  ];
-
-  const dangerousPatterns = [
-    'bit.ly', 'tinyurl', 'goo.gl', 't.co', 'ow.ly',
-    'password', 'urgent', 'winner', 'prize', 'free-gift', 'gift-card'
-  ];
 
   let riskScore = 0;
   const details = {
@@ -51,6 +89,8 @@ export const scanUrl = async (url: string): Promise<ScanResult> => {
   };
 
   const hostname = new URL(normalizedUrl).hostname.toLowerCase();
+  const hostParts = hostname.split('.');
+  const tld = hostParts[hostParts.length - 1] || '';
 
   // 1) دومينات محجوبة صراحة
   if (blockedDomains.some(d => hostname === d || hostname.endsWith(`.${d}`))) {
@@ -60,8 +100,6 @@ export const scanUrl = async (url: string): Promise<ScanResult> => {
   }
 
   // 2) امتداد عالي الخطورة
-  const hostParts = hostname.split('.');
-  const tld = hostParts[hostParts.length - 1] || '';
   if (highRiskTlds.includes(tld)) {
     riskScore += 35;
     details.suspicious = true;
@@ -93,10 +131,35 @@ export const scanUrl = async (url: string): Promise<ScanResult> => {
     details.suspicious = true;
   }
 
-  // 7) subdomains كثيرة
+  // 7) وجود @ في الـ path (تمويه المستخدم)
+  const hasAtSymbolInPath = /https?:\/\/[^\/@]+@/.test(urlLower);
+  if (hasAtSymbolInPath) {
+    riskScore += 30;
+    details.suspicious = true;
+  }
+
+  // 8) طول الرابط مبالغ فيه
+  if (normalizedUrl.length > 150) {
+    riskScore += 20;
+    details.suspicious = true;
+  }
+
+  // 9) subdomains كثيرة
   if (hostParts.length > 3) {
     riskScore += 30;
     details.suspicious = true;
+  }
+
+  // 10) (اختياري) فحص Google Safe Browsing
+  try {
+    const flaggedByGoogle = await checkWithGoogleSafeBrowsing(normalizedUrl);
+    if (flaggedByGoogle) {
+      riskScore = Math.max(riskScore, 80);
+      details.phishing = true;
+      details.suspicious = true;
+    }
+  } catch {
+    // لو فشل الـ API نكمل على الهيوريستكس فقط
   }
 
   // سقف للـ score
